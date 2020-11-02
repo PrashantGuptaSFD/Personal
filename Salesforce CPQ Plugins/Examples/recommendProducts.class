@@ -1,0 +1,47 @@
+global class CPQ_EnhancedSearchPlugin implements SBQQ.ProductSearchPlugin{
+    global CPQ_EnhancedSearchPlugin() {
+        System.debug('>> In Plugin');
+    }
+    
+    global Boolean isFilterHidden(SObject quote, String fieldName) {
+        return false;
+    }
+    
+    global String getFilterDefaultValue(SObject quote, String fieldName) {
+        return NULL;
+    }
+    
+    global Boolean isSuggestCustom(SObject quote, Map < String, Object > inputValuesMap) {
+        return true;
+    }
+    
+    global Boolean isSearchCustom(SObject quote, Map < String, Object > fieldValuesMap) {
+        return false;
+    }
+    
+    global String getAdditionalSearchFilters(SObject quote, Map < String, Object > fieldValuesMap) {
+        return null;
+    }
+    
+    global List < PriceBookEntry > search(SObject quote, Map < String, Object > fieldValuesMap) {
+        System.debug('i am inside search');
+        return null;
+    }
+    
+    global Boolean isInputHidden(SObject quote, String input) {
+        return false;
+    }
+    
+    global String getInputDefaultValue(SObject quote, String input) {
+        
+        return NULL;
+    }
+    
+    global String getAdditionalSuggestFilters(SObject quote, Map < String, Object > fieldValuesMap) {
+	    return null;
+    }
+
+    global List < PriceBookEntry > suggest(SObject quote, Map < String, Object > fieldValuesMap) {
+        return null;
+    }
+}

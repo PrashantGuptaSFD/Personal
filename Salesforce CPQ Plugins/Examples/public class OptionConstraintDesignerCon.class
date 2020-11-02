@@ -1,0 +1,195 @@
+public class OptionConstraintDesignerController {
+    @AuraEnabled 
+    public static void parseFile(String fileContent){
+        ID productId = '<<Product Record ID>>';
+        Map<String,Map<String,boolean>> parsingMap =new Map<String,Map<String,Boolean>>();
+        Map<Integer,String> columnNumberingMap = new Map<Integer,String>();
+        String Mappingfield = '';
+        boolean headerRow = true;
+        boolean intersectingCol = true;
+        boolean headerCol = true;
+        Integer columnCounter = 0;
+        for(String row : fileContent.split('\n')){
+            headerCol = true;
+            String  headerColName = '';            
+            columnCounter=0;
+            for(string col : row.split(',') ){
+                if(intersectingCol){
+                    Mappingfield = col;
+                    intersectingCol=false;
+                    continue;
+                }                
+                if(headerRow){
+                    columnCounter++;
+                    if(!columnNumberingMap.containsKey(columnCounter)){
+                        columnNumberingMap.put(columnCounter,col);
+                    }                   
+                    if(!parsingMap.containsKey(col)){
+                        parsingMap.put(col,new Map<String,Boolean>());
+                    }
+                }else{                    
+                    if(headerCol){
+                        headerCol = false;
+                        headerColName = col;
+                        for(String row2 : parsingMap.KeySet()){
+                            parsingMap.get(row2).put(col,False);
+                        }
+                        
+                    }else{
+                        columnCounter++;
+                        String headerRowNme = columnNumberingMap.get(columnCounter);
+                        if(parsingMap.containsKey(headerRowNme)){                          
+                            if(parsingMap.get(headerRowNme).containsKey(headerColName)){
+                                if(col == 'N'){
+                                    parsingMap.get(headerRowNme).put(headerColName,true);
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }
+            
+            if(headerRow){
+                headerRow =false;
+            }
+        }
+        List<SBQQ__OptionConstraint__c> optionConstraintList = new List<SBQQ__OptionConstraint__c>();
+        System.debug('>>' + parsingMap.size());
+        Map<String,Set<ID>> optionsMap = new Map<String,Set<ID>>();   
+        MAp<id,SBQQ__ProductOption__c> optionsIDMap = new MAp<id,SBQQ__ProductOption__c>();
+        Set<String> duplicationSet = new Set<String>();
+        for(SBQQ__ProductOption__c options : [SELECT Id,SBQQ__ComponentCode__c,SBQQ__ConfiguredSKU__r.ProductCode,SBQQ__ConfiguredSKU__r.PUC__c,SBQQ__OptionalSKU__r.ProductCode,SBQQ__OptionalSKU__r.PUC__c,SBQQ__ProductName__c FROM SBQQ__ProductOption__c
+                                              WHERE SBQQ__ConfiguredSKU__c = '<<Product Record ID>>']){
+                                                  if(!optionsMap.containsKey(options.SBQQ__OptionalSKU__r.PUC__c)){
+                                                      optionsMap.put(options.SBQQ__OptionalSKU__r.PUC__c,new Set<Id>());
+                                                  }
+                                                  optionsMap.get(options.SBQQ__OptionalSKU__r.PUC__c).add(options.id);
+                                                  optionsIDMap.put(options.id,options);
+                                              }
+        delete [SELECT ID from SBQQ__OptionConstraint__c];
+        for(String contraining : parsingMap.KeySet()){
+            for(String constrained : parsingMap.get(contraining).KeySet()){
+                if(parsingMap.get(contraining).get(constrained)){
+                    if(!optionsMap.containskey(contraining)){
+                            System.debug('>>++' + contraining);
+                        }
+                    for(String constrianingPUC : optionsMap.get(contraining)  ){
+                        if(!optionsMap.containskey(constrained)){
+                            System.debug('>>++' + constrained);
+                        }
+                        for(String constrianedPUC : optionsMap.get(constrained)){
+                            SBQQ__OptionConstraint__c con = new SBQQ__OptionConstraint__c();
+                            con.SBQQ__Active__c = true;
+                            con.SBQQ__CheckPriorPurchases__c = false;
+                            con.SBQQ__ConfiguredSKU__c = productID;
+                            if(optionsMap.containsKey(constrained))
+                                con.SBQQ__ConstrainedOption__c = constrianedPUC;
+                            else
+                                System.debug('??' + constrained);
+                            if(optionsMap.containsKey(contraining))
+                                con.SBQQ__ConstrainingOption__c = constrianingPUC;
+                            else
+                                System.debug('?? contraining' + contraining);
+                            con.Name = contraining + ' Excluding ' + constrained;
+                            con.SBQQ__Type__c ='Exclusion';
+                            optionConstraintList.add(con);
+                        }
+                    }                    
+                }
+            }
+        }
+        system.debug(optionConstraintList.Size());
+        insert optionConstraintList;
+        //System.assert(False,'??' +optionConstraintList);
+        
+    } 
+    @AuraEnabled 
+    public static void parseOptions(String fileContent){
+        Boolean cleanData=true;
+        ID ProductID = '01t2v00000BBfTOAA1';
+        List<SBQQ__ProductOption__c> productOptions = new List<SBQQ__ProductOption__c>();
+        List<SBQQ__ProductFeature__c> featuresList = new List<SBQQ__ProductFeature__c>();
+        if(cleanData){
+            productOptions = new List<SBQQ__ProductOption__c>([SELECT ID FROM SBQQ__ProductOption__c WHERE SBQQ__ConfiguredSKU__c='01t2v00000BBfTOAA1' ]);
+            if(!productOptions.isEmpty()){
+                delete productOptions;
+            }
+            featuresList = new List<SBQQ__ProductFeature__c>([SELECT Id,SBQQ__ConfiguredSKU__c FROM SBQQ__ProductFeature__c WHERE SBQQ__ConfiguredSKU__c='01t2v00000BBfTOAA1' ]);
+            if(!featuresList.IsEmpty()){
+                delete featuresList;
+            }
+        }
+        productOptions = new List<SBQQ__ProductOption__c>();
+        featuresList = new List<SBQQ__ProductFeature__c>();
+        
+        Integer ColNumber = 0;
+        Integer OrderNumber = 10;
+        Map<String,Map<String,String>> featuresMap = new Map<String,Map<String,String>>();
+        for(String row : fileContent.split('\n')){
+            ColNumber = 0;
+            String Category = null;
+            for(string col : row.split(',') ){  
+                if(ColNumber == 0){
+                    ColNumber++;
+                    Category = Col;
+                }
+                else if(ColNumber == 1){
+                    ColNumber++;
+                    SBQQ__ProductFeature__c feature = new SBQQ__ProductFeature__c();
+                    feature.SBQQ__Category__c = Category;
+                    feature.SBQQ__ConfiguredSKU__c= ProductID;
+                    feature.SBQQ__MinOptionCount__c = 0;
+                    feature.SBQQ__MaxOptionCount__c = 1;
+                    feature.SBQQ__Number__c = orderNumber;
+                    feature.SBQQ__OptionSelectionMethod__c = 'Click';
+                    feature.Name = Col;
+                    OrderNumber+=10;
+                    featuresList.add(feature);
+                }
+            }      
+        }
+        if(!featuresList.isempty()){
+            insert featuresList;
+        }
+        for(SBQQ__ProductFeature__c feat : featuresList){
+            if(!featuresMap.containsKey(feat.SBQQ__Category__c)){
+                featuresMap.put(feat.SBQQ__Category__c,new Map<String,String>());
+            }
+            featuresMap.get(feat.SBQQ__Category__c).put(feat.Name,feat.Id);
+        }
+        Integer Order = 10;
+        for(String row : fileContent.split('\n')){
+            ColNumber = 0;
+            String Category = null;
+            String feature = null;
+            for(string col : row.split(',') ){  
+                if(ColNumber == 0){
+                    Category = Col;
+                }
+                else if(ColNumber == 1){
+                    feature = col;
+                }else{
+                    Order+=10;
+                    SBQQ__ProductOption__c opt = new SBQQ__ProductOption__c();
+                    opt.SBQQ__OptionalSKU__c = col;
+                    opt.SBQQ__ConfiguredSKU__c = ProductID;
+                    opt.SBQQ__Feature__c = featuresMap.get(Category).get(feature);
+                    opt.SBQQ__Number__c = order;
+                    opt.SBQQ__Quantity__c = 1;
+                    opt.SBQQ__QuantityEditable__c = false;
+                    opt.SBQQ__Type__c = 'Related Product';
+                    productOptions.add(opt);
+                }
+                
+                ColNumber++;  
+            }
+        }
+        if(!productOptions.isempty()){
+            //System.assert(false,'>>'+productOptions);
+            insert productOptions;
+            System.assert(false,'>>'+productOptions);
+        }
+        
+    } 
+}
