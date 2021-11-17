@@ -3,14 +3,13 @@
  * @author            : Prashant Gupta (Timber View)
  * @group             : 
  * @last modified on  : 11-17-2021
- * @last modified by  : Prashant Gupta (Timber View) 
+ * @last modified by  : Prashant Gupta (Timber View)
  * Modifications Log
  * Ver   Date         Author                         Modification
  * 1.0   11-17-2021   Prashant Gupta (Timber View)   Initial Version
 **/
 import { LightningElement } from 'lwc';
-import getLogs from '@salesforce/apex/TLOG_Controller.getLogs';
-import SystemModstamp from '@salesforce/schema/Account.SystemModstamp';
+import getLogs from '@salesforce/apex/TV_LogListController.getLogs';
 const columns = [
     { label: 'ID', fieldName: 'id' },
     { label: 'Location', fieldName: 'location', type: 'text',sortable:true },
