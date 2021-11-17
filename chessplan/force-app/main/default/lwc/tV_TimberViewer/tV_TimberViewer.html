@@ -1,0 +1,68 @@
+<template>
+    <div class="c-container">
+        <lightning-layout multiple-rows="true">
+            <lightning-layout-item padding="around-small" size="12">
+                <div class="page-section page-header">
+                    <h1>Timber Viewer</h1>
+                </div>
+            </lightning-layout-item>
+            <lightning-layout-item padding="around-small" size="12">
+                <div class="page-section page-header">
+                    <lightning-input type="file"
+                             label="CSV file"
+                             multiple="false"
+                             accept=".log"
+                             onchange={handleInputChange}></lightning-input>
+                </div>
+            </lightning-layout-item>
+            <lightning-layout-item padding="around-small" size="12">
+                <lightning-layout>
+                    <lightning-layout-item padding="around-small" size="8">
+                        <div class="page-section page-main">
+                            <h2>Main</h2>
+                            <p>Donec viverra pellentesque aliquet. Praesent quis tristique mauris, ac tincidunt ante.
+                                Nulla lectus nisi, tempor quis malesuada ac, consequat in velit. Nullam aliquam mauris eu magna
+                                dictum, in ornare risus convallis. Nunc condimentum ornare libero sit amet rhoncus. Aliquam tellus nisl,
+                                tristique sit amet congue in, tristique vel risus. Morbi leo ligula, blandit nec commodo at, pulvinar
+                                vitae libero. Mauris ipsum erat, aliquam a turpis vitae, faucibus viverra arcu. Donec id purus
+                                luctus enim elementum molestie sit amet ac libero.
+                            </p>
+                            <p>Mauris cursus felis elementum ipsum placerat, in maximus justo pretium. Nam nec sapien
+                                maximus justo feugiat tristique. Mauris viverra erat vitae arcu feugiat, sed posuere purus vulputate.
+                                Sed et nulla ut magna iaculis fringilla. Integer eget blandit elit. Phasellus nulla augue, lobortis a
+                                elementum tempus, auctor et felis. Fusce quis lorem tincidunt risus ullamcorper pharetra. Sed elit
+                                nulla, efficitur a lorem quis, mollis tristique elit. Etiam odio libero, ornare sed vehicula
+                                in, sagittis et erat. Integer at justo molestie, suscipit dui vel, scelerisque ex. Nulla non metus
+                                pulvinar, egestas neque et, tincidunt tellus. Praesent egestas scelerisque tristique. Nullam
+                                sodales ex acmetus tincidunt accumsan. Cras vitae consequat odio. Pellentesque facilisis lobortis
+                                lorem, at placerat mauris sagittis a.
+                            </p>
+                        </div>
+                    </lightning-layout-item>
+                    <lightning-layout-item padding="around-small" size="4">
+                        <div class="page-section page-right">
+                            <h2>Right Sidebar</h2>
+                            <ul>
+                                <li><a href="#">Archive 1</a>
+                                </li>
+                                <li><a href="#">Archive 2</a>
+                                </li>
+                                <li><a href="#">Archive 3</a>
+                                </li>
+                                <li><a href="#">Archive 4</a>
+                                </li>
+                                <li><a href="#">Archive 5</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </lightning-layout-item>
+            <lightning-layout-item flexibility="auto" padding="around-small" size="12">
+                <div class="page-footer page-section">
+                    <h2>Footer</h2>
+                </div>
+            </lightning-layout-item>
+        </lightning-layout>
+    </div>
+</template>
